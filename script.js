@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (user) {
             // Usuário está logado
             showLoading();
-            getUserData(user.uid).then(userData => {
+            ensureUserDocument(user).then(userData => {
                 // Verificar se o usuário está ativo
                 if (userData.status === 'inactive' && userData.userType === 'aluno') {
                     auth.signOut();
@@ -433,6 +433,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 hideLoading();
                 console.error('Erro ao carregar dados do usuário:', error);
                 auth.signOut();
+                showAuth();
+                showError('login-error', getAuthErrorMessage(error));
             });
         } else {
             // Nenhum usuário logado

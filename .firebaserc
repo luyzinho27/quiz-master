@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "quiz-master-8c3a9"
-  }
+  },
+  "targets": {
+    "quiz-master-8c3a9": {
+      "hosting": {
+        "app": [
+          "quiz-master-cameta"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

@@ -2,7 +2,7 @@
 
 <div align="center">
   
-  ![QuizMaster Banner](images/quizmaster-banner.png)
+  ![QuizMaster Banner](public/images/quizmaster-banner.png)
   
   [![Licença](https://img.shields.io/badge/licença-MIT-blue.svg)](LICENSE)
   [![Versão](https://img.shields.io/badge/versão-1.0.1-brightgreen.svg)](https://github.com/luyzinho27/quiz-master)

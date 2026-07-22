@@ -1,11 +1,11 @@
 // Configuração do Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyD3e5rXGWsaeHHHx5YO3lwKz5poIwZbLiM",
-    authDomain: "quiz-informatica-2025.firebaseapp.com",
-    projectId: "quiz-informatica-2025",
-    storageBucket: "quiz-informatica-2025.firebasestorage.app",
-    messagingSenderId: "1006125147967",
-    appId: "1:1006125147967:web:539b201776164523e5558a"
+    apiKey: "AIzaSyAPqzFBS84Tb2ZkcQQLBTTWLOlPKVIDjis",
+    authDomain: "quiz-master-8c3a9.firebaseapp.com",
+    projectId: "quiz-master-8c3a9",
+    storageBucket: "quiz-master-8c3a9.firebasestorage.app",
+    messagingSenderId: "345848500787",
+    appId: "1:345848500787:web:9bd5caf31be383f55e4946"
 };
 
 // Inicializar Firebase
@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Erro ao processar getRedirectResult:', error);
             // Mostrar erro amigável
             hideLoading();
-            showError('login-error', getAuthErrorMessage(error.code));
+            showError('login-error', getAuthErrorMessage(error));
         });
 });
 
@@ -512,10 +512,7 @@ function initAuth() {
         
         showLoading();
         auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                // Verificar status do usuário
-                return getUserData(userCredential.user.uid);
-            })
+            .then((userCredential) => ensureUserDocument(userCredential.user))
             .then(userData => {
                 if (userData.status === 'inactive' && userData.userType === 'aluno') {
                     auth.signOut();
@@ -529,8 +526,9 @@ function initAuth() {
                 hideLoading();
             })
             .catch((error) => {
+                console.error('Erro no login com e-mail e senha:', error);
                 hideLoading();
-                showError('login-error', getAuthErrorMessage(error.code));
+                showError('login-error', getAuthErrorMessage(error));
             });
     });
     
@@ -581,7 +579,7 @@ function initAuth() {
                 alert('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
             })
             .catch(error => {
-                alert('Erro ao enviar e-mail de recuperação: ' + getAuthErrorMessage(error.code));
+                alert('Erro ao enviar e-mail de recuperação: ' + getAuthErrorMessage(error));
             });
     });
     
@@ -717,8 +715,9 @@ function registerUser(name, email, password, userType) {
             }, 2000);
         })
         .catch((error) => {
+            console.error('Erro ao registrar usuario:', error);
             hideLoading();
-            showError('register-error', getAuthErrorMessage(error.code));
+            showError('register-error', getAuthErrorMessage(error));
         });
 }
 
@@ -783,7 +782,7 @@ function signInWithGoogle() {
             }
 
             hideLoading();
-            showError('login-error', getAuthErrorMessage(error.code));
+            showError('login-error', getAuthErrorMessage(error));
         });
 }
 
@@ -1122,23 +1121,34 @@ function showSuccess(elementId, message) {
 }
 
 // Obter mensagem de erro amigável
-function getAuthErrorMessage(errorCode) {
+function getAuthErrorMessage(error) {
+    const errorCode = typeof error === 'string' ? error : error?.code;
     const messages = {
         'auth/invalid-email': 'E-mail inválido.',
         'auth/user-disabled': 'Esta conta foi desativada.',
         'auth/user-not-found': 'Nenhuma conta encontrada com este e-mail.',
         'auth/wrong-password': 'Senha incorreta.',
+        'auth/invalid-credential': 'E-mail ou senha inválidos.',
         'auth/email-already-in-use': 'Este e-mail já está em uso.',
         'auth/weak-password': 'A senha é muito fraca.',
-        'auth/operation-not-allowed': 'Operação não permitida.',
+        'auth/operation-not-allowed': 'Operação não permitida. Verifique se o provedor de login está habilitado no Firebase Authentication.',
+        'auth/unauthorized-domain': 'Domínio não autorizado no Firebase Authentication. Adicione o domínio atual em Authentication > Settings > Authorized domains.',
+        'auth/api-key-not-valid': 'Chave de API do Firebase inválida. Confira a configuração do app Web no Firebase Console.',
+        'auth/invalid-api-key': 'Chave de API do Firebase inválida. Confira a configuração do app Web no Firebase Console.',
         'auth/popup-closed-by-user': 'Login cancelado. Tente novamente.',
         'auth/cancelled-popup-request': 'Outra janela de login ja esta aberta.',
         'auth/popup-blocked': 'Pop-up bloqueado pelo navegador. Libere o pop-up e tente novamente.',
         'auth/account-exists-with-different-credential': 'Ja existe uma conta com este e-mail. Entre com e-mail e senha e vincule o Google nas configuracoes.',
-        'auth/too-many-requests': 'Muitas tentativas. Tente novamente mais tarde.'
+        'auth/too-many-requests': 'Muitas tentativas. Tente novamente mais tarde.',
+        'permission-denied': 'Sem permissão para acessar o Firestore. Verifique as regras do banco e se o usuário está autenticado.',
+        'not-found': 'Registro do usuário não encontrado no Firestore.',
+        'unavailable': 'Firebase indisponível no momento. Verifique sua conexão e tente novamente.',
+        'invalid-argument': 'Configuração inválida do Firebase. Confira projectId, apiKey e appId no Firebase Console.',
+        'failed-precondition': 'O Firestore precisa de uma configuração/índice antes de concluir essa operação.',
+        'resource-exhausted': 'Limite do Firebase excedido no momento. Tente novamente mais tarde.'
     };
     
-    return messages[errorCode] || 'Ocorreu um erro. Tente novamente.';
+    return messages[errorCode] || (errorCode ? `Ocorreu um erro (${errorCode}). Tente novamente.` : 'Ocorreu um erro. Tente novamente.');
 }
 
 // ===============================

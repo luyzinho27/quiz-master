@@ -1,0 +1,26 @@
+// Firebase Security Rules for user roles and permissions
+
+{{workspace}}
+
+rules = {
+  version: '2.0',
+  "users": {
+    "$userId": {
+      allow read, write: if request.auth != null && request.auth.uid == $userId;
+    }
+  },
+  "rooms": {
+    "$roomId": {
+      allow read, write: if request.auth != null &&
+        (resource.data.professorId == request.auth.uid ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data().role == 'admin');
+    }
+  },
+  "quizzes": {
+    "$quizId": {
+      allow read, write: if request.auth != null &&
+        (resource.data.professorId == request.auth.uid ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data().role == 'admin');
+    }
+  }
+};
